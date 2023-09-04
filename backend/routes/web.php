@@ -14,6 +14,7 @@ use App\Http\Controllers\SearchController;
 */
 
 Route::get('/', 'SearchController@index');
-Route::post('/search', 'SearchController@search');
+Route::post('/search/mercado-livre', 'SearchController@searchMercadoLivre');
+Route::post('/search/buscape', 'SearchController@searchBuscape');
 Route::post('/save-result', 'SearchController@saveResult');
 

@@ -50,10 +50,16 @@ class SearchController extends Controller
     {
         $baseUrl = 'https://www.mercadolivre.com.br/';
         $client = new Client();
-        $crawler = $client->request('GET', $baseUrl . 'search/' . urlencode($searchText));
+        $crawler = $client->request('GET', $baseUrl);
+
+        $form = $crawler->filter('.nav-search')->form();
+
+        $form['nav-search-input'] = $searchText;
+
+        $crawler = $client->submit($form);
 
         $results = $crawler->filter('')->each(function (Crawler $node) {
-            $title = $node->filter('')->text();
+            $description = $node->filter('')->text();
             $price = $node->filter('')->text();
             $link = $node->filter('')->attr('href');
             $photo = $node->filter('')->attr('src');
@@ -61,7 +67,7 @@ class SearchController extends Controller
 
             return [
                 'Photo' => $photo,
-                'Description' => $title,
+                'Description' => $description,
                 'Category' => $category,
                 'Price' => $price,
                 'Website' => 'Mercado Livre',
@@ -79,7 +85,7 @@ class SearchController extends Controller
         $crawler = $client->request('GET', $baseUrl . 'search/' . urlencode($searchText));
 
         $results = $crawler->filter('')->each(function (Crawler $node) {
-            $title = $node->filter('')->text();
+            $description = $node->filter('')->text();
             $price = $node->filter('')->text();
             $link = $node->filter('')->attr('href');
             $photo = $node->filter('')->attr('src');
@@ -87,7 +93,7 @@ class SearchController extends Controller
 
             return [
                 'Photo' => $photo,
-                'Description' => $title,
+                'Description' => $description,
                 'Category' => $category,
                 'Price' => $price,
                 'Website' => 'Buscapé',
