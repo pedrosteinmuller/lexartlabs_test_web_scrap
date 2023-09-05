@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Goutte\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
+use Exception;
 // use Symfony\Component\BrowserKit\HttpBrowser;
 use Illuminate\Http\Request;
 use App\Models\SearchResult;
@@ -64,12 +65,19 @@ class SearchController extends Controller
         $crawler = $client->submit($form);
 
 
-        $results = $crawler->filter('.ui-search-layout__item')->each(function (Crawler $node) {
+        $results = $crawler->filter('.ui-search-result__wrapper')->slice(0, 5)->each(function (Crawler $node) use ($client) {
             $description = $node->filter('h2')->text();
-            $price = $node->filter('.andes-money-amount')->text();
-            $link = $node->filter('')->attr('href');
-            $photo = $node->filter('')->attr('src');
+            $price = $node->filter('.andes-money-amount__fraction')->text();
+            $link = $node->filter('a.ui-search-item__group__element')->attr('href');
+            $photo = $node->filter('.shops__image-element')->attr('data-src');
             $category = 'Mobile';
+
+            try {
+                usleep(100000);
+                $productPage = $client->request('GET', $link);
+                $description = $productPage->filter('.ui-pdp-description__content')->text();
+            } catch(Exception $e) {
+            }
 
             return [
                 'Photo' => $photo,
@@ -90,11 +98,11 @@ class SearchController extends Controller
         $client = new Client();
         $crawler = $client->request('GET', $baseUrl . 'search/' . urlencode($searchText));
 
-        $results = $crawler->filter('')->each(function (Crawler $node) {
-            $description = $node->filter('')->text();
-            $price = $node->filter('')->text();
-            $link = $node->filter('')->attr('href');
-            $photo = $node->filter('')->attr('src');
+        $results = $crawler->filter('.ProductCard_ProductCard__EEJFq')->slice(0, 5)->each(function (Crawler $node) {
+            $description = $node->filter('.ProductCard_ProductCard_Name__LT7hv')->text();
+            $price = $node->filter('.Text_MobileHeadingS__Zxam2')->text();
+            $link = $node->filter('.ProductCard_ProductCard_Inner__tsD4M')->attr('href');
+            $photo = $node->filter('.ProductCard_ProductCard_Image__qriN4 span img')->attr('src');
             $category = 'Mobile';
 
             return [
