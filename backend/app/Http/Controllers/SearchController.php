@@ -18,15 +18,7 @@ class SearchController extends Controller
         $results = $this->webScrapMercadoLivre($searchText);
 
         // Salvando os resultados no banco de dados
-        foreach ($results as $result) {
-            SearchResult::create([
-                'photo' => $result['Photo'],
-                'description' => $result['Description'],
-                'category' => $result['Category'],
-                'price' => $result['Price'],
-                'source_website' => $result['Website'],
-            ]);
-        }
+        $this->saveResults($results);
 
         return response()->json(['products' => $results]);
     }
@@ -36,17 +28,29 @@ class SearchController extends Controller
         $searchText = $request->input('searchText');
         $results = $this->webScrapBuscape($searchText);
 
-        foreach ($results as $result) {
-            SearchResult::create([
-                'photo' => $result['Photo'],
-                'description' => $result['Description'],
-                'category' => $result['Category'],
-                'price' => $result['Price'],
-                'source_website' => $result['Website'],
-            ]);
-        }
+        $this->saveResults($results);
 
         return response()->json(['products' => $results]);
+    }
+
+    private function saveResults($results)
+    {
+        if (empty($results)) {
+            return;
+        }
+
+        try {
+            foreach ($results as $result) {
+                SearchResult::create([
+                    'photo' => $result['Photo'],
+                    'description' => $result['Description'],
+                    'category' => $result['Category'],
+                    'price' => $result['Price'],
+                    'source_website' => $result['Website'],
+                ]);
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();        }
     }
 
     private function webScrapMercadoLivre($searchText)
