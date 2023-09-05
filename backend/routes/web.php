@@ -12,8 +12,8 @@ use App\Http\Controllers\SearchController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', 'SearchController@index');
+// Route::get('/', [App\Http\Controllers\SearchController::class, 'searchMercadoLivre'])->name('searchMercadoLivre');
+Route::get('/', 'SearchController@searchMercadoLivre');
 Route::post('/search/mercado-livre', 'SearchController@searchMercadoLivre');
 Route::post('/search/buscape', 'SearchController@searchBuscape');
 Route::post('/save-result', 'SearchController@saveResult');

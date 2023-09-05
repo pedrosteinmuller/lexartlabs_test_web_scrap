@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Goutte\Client;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpClient\HttpClient;
+// use Symfony\Component\BrowserKit\HttpBrowser;
 use Illuminate\Http\Request;
 use App\Models\SearchResult;
 
@@ -49,8 +51,11 @@ class SearchController extends Controller
     private function webScrapMercadoLivre($searchText)
     {
         $baseUrl = 'https://www.mercadolivre.com.br/';
-        $client = new Client();
+        $client = new Client(HttpClient::create(['timeout' => 60]));
         $crawler = $client->request('GET', $baseUrl);
+
+        // echo "<pre>";
+        // print_r($crawler);
 
         $form = $crawler->filter('.nav-search')->form();
 
@@ -58,9 +63,10 @@ class SearchController extends Controller
 
         $crawler = $client->submit($form);
 
-        $results = $crawler->filter('')->each(function (Crawler $node) {
-            $description = $node->filter('')->text();
-            $price = $node->filter('')->text();
+
+        $results = $crawler->filter('.ui-search-layout__item')->each(function (Crawler $node) {
+            $description = $node->filter('h2')->text();
+            $price = $node->filter('.andes-money-amount')->text();
             $link = $node->filter('')->attr('href');
             $photo = $node->filter('')->attr('src');
             $category = 'Mobile';
